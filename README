@@ -1,0 +1,15 @@
+This Arduino GPX library provides a basic class to facilitate the creation of 
+a valid GPX output.
+
+Requirements:
+  * Arduino 0019 or greater
+
+Limitations:
+  * Only a limited set of properties have been implemented at this time
+  * To conserve memory each element should be serially retrieved and written to
+    it's final location [read: sdcard/serialport/etc]
+
+Install:
+  To install copy the GPX/ directory into your arduino 'libraries' directory
+  ie:
+    cp -a GPX [/path/to/arduino]/libraries
