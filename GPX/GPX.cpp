@@ -123,7 +123,7 @@ void GPX::setSrc(String src){
 String GPX::wrapCDATA(String input){
   String localStr("<![CDATA[");
   localStr += input;
-  localStr += "]]";
+  localStr += "]]>";
 
   return localStr;
 }

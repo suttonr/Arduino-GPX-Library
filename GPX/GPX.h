@@ -12,7 +12,7 @@
 #include <WProgram.h>
 #include <WString.h>
 
-#define _GPX_HEAD "<gpx version=\"1.0\" creator=\"Arduino GPX Lib\"\n xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n xmlns=\"http://www.topografix.com/GPX/1/0\"\n xmlns:topografix=\"http://www.topografix.com/GPX/Private/TopoGrafix/0/1\"\n xsi:schemaLocation=\"http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd\"\n>\n"
+#define _GPX_HEAD "<gpx version=\"1.1\" creator=\"Arduino GPX Lib\"\n xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n xmlns=\"http://www.topografix.com/GPX/1/1\"\n xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"\n>\n"
 #define _GPX_TAIL               "</gpx>\n"
 #define _GPX_META_HEAD          "<metadata>"
 #define _GPX_META_TAIL          "</metadata>\n"
