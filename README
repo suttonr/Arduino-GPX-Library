@@ -13,3 +13,4 @@ Install:
   To install copy the GPX/ directory into your arduino 'libraries' directory
   ie:
     cp -a GPX [/path/to/arduino]/libraries
+
