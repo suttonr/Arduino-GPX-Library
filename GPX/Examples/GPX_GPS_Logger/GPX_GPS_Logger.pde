@@ -35,55 +35,115 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
 */
-#include <SdFatUtil.h>
-#include <SdFat.h>
+
+#include <Fat16.h>
+#include <Fat16util.h> 
+
+#include <GPX.h>
 
 #include <TinyGPS.h>
 #include <NewSoftSerial.h>
 
+#define   ERROR_LED      2
+#define   SDWRITE_LED    3
+#define   ENABLED_LED    4
+#define   DONE_LED       5
+
+#define   COLLECT_SW     7
+
+#define   WRDELAY        100
+
+
+
+// serial,gpx and gps globals
 NewSoftSerial gps(9,8);
 TinyGPS gpsParser;
+GPX myGPX;
 
-Sd2Card card;
-SdVolume volume;
-SdFile root;
-SdFile file;
+SdCard card;
+Fat16 file;
+
+//state global
+unsigned short state = 0;
 
 // store error strings in flash to save RAM
-// From SdFatPrint Example
+// From fat16print example
+// http://code.google.com/p/fat16lib/
 #define error(s) error_P(PSTR(s))
 void error_P(const char* str) {
   PgmPrint("error: ");
   SerialPrintln_P(str);
-  if (card.errorCode()) {
-    digitalWrite(3, HIGH);
+  if (card.errorCode) {
+    digitalWrite(ERROR_LED, HIGH);
     PgmPrint("SD error: ");
-    Serial.print(card.errorCode(), HEX);
-    Serial.print(',');
-    Serial.println(card.errorData(), HEX);
+    Serial.print(card.errorCode, HEX);
   }
   while(1);
 }
 
+void openElement(){
+  Serial.print(myGPX.getOpen());
+  delay(WRDELAY);
+  //myGPX.setMetaDesc("foofoofoo");
+  //myGPX.setName("track name");
+  //myGPX.setDesc("Track description");
+  //myGPX.setSrc("SUP500Ff");
+  //Serial.print(myGPX.getMetaData());
+  delay(WRDELAY);
+  Serial.print(myGPX.getTrakOpen());
+  delay(WRDELAY);
+  Serial.print(myGPX.getInfo());
+  delay(WRDELAY);
+  Serial.print(myGPX.getTrakSegOpen());
+  //if (Serial.writeError || !file.sync()) error ("print or sync");
+}
+
+void closeElement(){
+  Serial.print(myGPX.getTrakSegClose());
+  Serial.print(myGPX.getTrakClose());
+  Serial.print(myGPX.getClose());
+  //if (Serial.writeError || !file.sync()) error ("print or sync");
+}
+
 void setup() {
+  // Setup serial port
   Serial.begin(9600);
   gps.begin(9600);
-  pinMode(2, OUTPUT);
-  pinMode(3, OUTPUT);
-  digitalWrite(2, LOW);
-  digitalWrite(3, LOW);
-  if (!card.init(SPI_HALF_SPEED)) error("card.init failed");
-  if (!volume.init(&card)) error("volume.init failed");
-  if (!root.openRoot(&volume)) error("openRoot failed");
+  
+  //setup pins & init to low
+  pinMode(ERROR_LED, OUTPUT);
+  pinMode(SDWRITE_LED, OUTPUT);
+  pinMode(ENABLED_LED, OUTPUT);
+  pinMode(DONE_LED, OUTPUT);
+  pinMode(COLLECT_SW, INPUT);
+  digitalWrite(ERROR_LED, LOW);
+  digitalWrite(SDWRITE_LED, LOW);
+  digitalWrite(ENABLED_LED, LOW);
+  digitalWrite(DONE_LED, LOW);
+ 
+  // initialize the SD card
+  // from fat16print example
+  // http://code.google.com/p/fat16lib/
+  if (!card.init()) error("card.init");
+  if (!Fat16::init(&card)) error("Fat16::init");
+  
   // create a new file
-  char name[] = "GPSDAT00.TXT";
+  char name[] = "PRINT00.TXT";
   for (uint8_t i = 0; i < 100; i++) {
-    name[6] = i/10 + '0';
-    name[7] = i%10 + '0';
-    // only create new file for write
-    if (file.open(&root, name, O_CREAT | O_EXCL | O_WRITE)) break;
+    name[5] = i/10 + '0';
+    name[6] = i%10 + '0';
+    // O_CREAT - create the file if it does not exist
+    // O_EXCL - fail if the file exists
+    // O_WRITE - open for write
+    if (file.open(name, O_CREAT | O_EXCL | O_WRITE)) break;
   }
-  if (!file.isOpen()) error ("file.create");
+  if (!file.isOpen()) error ("create");
+  PgmPrint("Printing to: ");
+  Serial.println(name);
+  
+  // clear write error
+  file.writeError = false;
+  
 }
 
 void loop(){
@@ -91,26 +151,39 @@ void loop(){
   unsigned long fix_age, time, date, speed, course;
   unsigned long chars;
   unsigned short sentences, failed_checksum;
-
-  digitalWrite(3, LOW);
-  if(gps.available()) {
+  
+  
+  //decide if we need to open or close the GPX element
+  if ((state == 0 )&&(digitalRead(COLLECT_SW)==LOW)){
+    openElement();
+    state=1;
+    digitalWrite(ENABLED_LED, HIGH);
+  }
+  if ((state == 1 )&&(digitalRead(COLLECT_SW)==HIGH)){
+    closeElement();
+    state=0;
+    digitalWrite(ENABLED_LED, LOW);
+    digitalWrite(DONE_LED, HIGH);
+  }
+  
+  digitalWrite(SDWRITE_LED, LOW);
+  if(gps.available() && state) {
     int c = gps.read();
     if (gpsParser.encode(c)){
-      digitalWrite(3, HIGH);
+      digitalWrite(SDWRITE_LED, HIGH);
       gpsParser.get_position(&lat, &lon, &fix_age);
-      file.print(lat);
-      file.print(",");
-      file.print(lon);
-      file.print("\n");
+      
+      Serial.print(myGPX.getPt(GPX_TRKPT,lat,lon));
+      
       gps.print(lat);
       gps.print(",");
       gps.print(lon);
       gps.print("\r");
-      if (file.writeError || !file.sync()) error ("print or sync");
+      //Serial.print(String(lat)+"\n");
+      //if (file.writeError || !file.sync()) error ("print or sync");
       
     }
     
-    //Serial.print(c,BYTE);
   }
 
 }
