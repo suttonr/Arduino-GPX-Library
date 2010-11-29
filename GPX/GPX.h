@@ -77,8 +77,6 @@ class GPX{
     String getInfo();
     String getPt(String typ, String lon, String lat);
     String getPt(String typ, String lon, String lat, String ele);
-    void setMetaName(String name);
-    void setMetaDesc(String desc);
     void setName(String name);
     void setDesc(String desc);
     void setEle(String ele);
@@ -87,8 +85,6 @@ class GPX{
     void setTime(String time);
   private:
     //Variables
-    String _metaName;
-    String _metaDesc;
     String _name;
     String _desc;
     String _ele;

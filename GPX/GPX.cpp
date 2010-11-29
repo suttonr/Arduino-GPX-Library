@@ -46,14 +46,14 @@ String GPX::getClose(){
 
 String GPX::getMetaData(){
   String localStr(_GPX_META_HEAD);
-  if (_metaName.length() > 0){
+  if (_name.length() > 0){
     localStr = localStr + String(_GPX_NAME_HEAD);
-    localStr = localStr + wrapCDATA(_metaName);
+    localStr = localStr + wrapCDATA(_name);
     localStr = localStr + String(_GPX_NAME_TAIL);
   }
-  if (_metaDesc.length() > 0){
+  if (_desc.length() > 0){
     localStr = localStr + String(_GPX_DESC_HEAD);
-    localStr = localStr + wrapCDATA(_metaDesc);
+    localStr = localStr + wrapCDATA(_desc);
     localStr = localStr + String(_GPX_DESC_TAIL);
   }
   localStr = localStr + String(_GPX_META_TAIL);
@@ -120,12 +120,6 @@ String GPX::getPt(String typ, String lon, String lat, String ele){
 }
 
 //Set Methods
-void GPX::setMetaName(String name){
-  _metaName = name;
-}
-void GPX::setMetaDesc(String desc){
-  _metaDesc = desc;
-}
 void GPX::setName(String name){
   _name = name;
 }
