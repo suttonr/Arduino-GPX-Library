@@ -1,3 +1,5 @@
+#include <Flash.h>
+
 /* 
  * GPS Logger -- GPX-GPS-Logger.pde
  * Created by: Ryan M Sutton
@@ -66,6 +68,23 @@ Fat16 file;
 //state global
 unsigned short state = 0;
 
+int LoadAvailMem(){ // works with ATmega168, ATmega328 and ATmega644
+#if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)
+  int size = 4096;                      // if ATMega644
+#elif defined(__AVR_ATmega328P__)
+  int size = 2048;                      // if ATmega328
+#elif defined(__AVR_ATmega168__)
+  int size = 1024;                      // if ATmega168
+#endif
+  byte *buf;
+  //memset(FreeChar,0,sizeof(FreeChar));
+  //memset(message,0,sizeof(message));
+  while ((buf = (byte *) malloc(--size)) == NULL);
+  free(buf);
+  return size;
+}
+
+
 // store error strings in flash to save RAM
 // From fat16print example
 // http://code.google.com/p/fat16lib/
@@ -82,27 +101,31 @@ void error_P(const char* str) {
 }
 
 void openElement(){
-  Serial.print(myGPX.getOpen());
+  file.print(myGPX.getOpen());
+  //Serial << F(_GPX_HEAD);
   delay(WRDELAY);
-  //myGPX.setMetaDesc("foofoofoo");
+  //myGPX.setName("TestName");
+  //myGPX.setDesc("foofoofoo");
+  //file.print(myGPX.getMetaData());
+  //delay(WRDELAY);
   //myGPX.setName("track name");
   //myGPX.setDesc("Track description");
   //myGPX.setSrc("SUP500Ff");
   //Serial.print(myGPX.getMetaData());
+  //delay(WRDELAY);
+  file.print(myGPX.getTrakOpen());
   delay(WRDELAY);
-  Serial.print(myGPX.getTrakOpen());
-  delay(WRDELAY);
-  Serial.print(myGPX.getInfo());
-  delay(WRDELAY);
-  Serial.print(myGPX.getTrakSegOpen());
-  //if (Serial.writeError || !file.sync()) error ("print or sync");
+  //file.print(myGPX.getInfo());
+  //delay(WRDELAY);
+  file.print(myGPX.getTrakSegOpen());
+  if (file.writeError || !file.sync()) error ("print or sync");
 }
 
 void closeElement(){
-  Serial.print(myGPX.getTrakSegClose());
-  Serial.print(myGPX.getTrakClose());
-  Serial.print(myGPX.getClose());
-  //if (Serial.writeError || !file.sync()) error ("print or sync");
+  file.print(myGPX.getTrakSegClose());
+  file.print(myGPX.getTrakClose());
+  file.print(myGPX.getClose());
+  if (file.writeError || !file.sync()) error ("print or sync");
 }
 
 void setup() {
@@ -173,17 +196,16 @@ void loop(){
       digitalWrite(SDWRITE_LED, HIGH);
       gpsParser.get_position(&lat, &lon, &fix_age);
       
-      Serial.print(myGPX.getPt(GPX_TRKPT,lat,lon));
+      file.print(myGPX.getPt(GPX_TRKPT,lat,lon));
       
       gps.print(lat);
       gps.print(",");
       gps.print(lon);
       gps.print("\r");
       //Serial.print(String(lat)+"\n");
-      //if (file.writeError || !file.sync()) error ("print or sync");
+      if (file.writeError || !file.sync()) error ("print or sync");
       
     }
     
-  }
-
+  } 
 }
