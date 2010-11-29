@@ -68,6 +68,7 @@ class GPX{
   public:
     GPX();
     String getOpen();
+//    void printOpen(Print &stream);
     String getClose();
     String getMetaData();
     String getTrakOpen();

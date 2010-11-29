@@ -39,6 +39,9 @@ GPX::GPX(){
 String GPX::getOpen(){
   return String(_GPX_HEAD);
 }
+//void printOpen(Print &ss){
+//  ss << F(_GPX_HEAD);
+//}
 
 String GPX::getClose(){
   return String(_GPX_TAIL);
