@@ -94,16 +94,17 @@ String GPX::getInfo(){
   return localStr;
 }
 
-String GPX::getPt(String typ, String lon, String lat){
+String GPX::getPtOpen(String typ, long lon, long lat){
   String localStr(_GPX_PT_HEAD);
   localStr = localStr.replace("TYPE",typ);
-  localStr += lat + "\" lon=\""; 
-  localStr += lon + "\">";
-  if (_ele.length() > 0){
-    localStr += _GPX_ELE_HEAD;
-    localStr += _ele;
-    localStr += _GPX_ELE_TAIL;
-  }
+  localStr += formatPos(lat,100000) + "\" lon=\""; 
+  localStr += formatPos(lon,100000) + "\">";
+  //if (_ele != 999999999){
+  //if (_ele.length() > 0){
+  //  localStr += _GPX_ELE_HEAD;
+  //  localStr += _ele;
+  //  localStr += _GPX_ELE_TAIL;
+  //}
   if (_sym.length() > 0){
     localStr += _GPX_SYM_HEAD;
     localStr += _sym;
@@ -117,10 +118,38 @@ String GPX::getPt(String typ, String lon, String lat){
   localStr += String(_GPX_PT_TAIL).replace("TYPE",typ);
   return localStr;
 }
-    
-String GPX::getPt(String typ, String lon, String lat, String ele){
 
+String GPX::getPtClose(String typ){
+  return String(_GPX_PT_TAIL).replace("TYPE",typ);
 }
+
+String GPX::getStrParm(String parm,String ele){
+  String localStr("<");
+
+  localStr += parm;
+  localStr += ">";
+  localStr += ele;
+  localStr += "</";
+  localStr += parm;
+  localStr += ">";
+
+  return localStr;
+}
+
+
+String GPX::getLongParm(String parm,long ele){
+  String localStr("<");
+  
+  localStr += parm;
+  localStr += ">";
+  localStr += formatPos(ele,10);
+  localStr += "</";
+  localStr += parm;
+  localStr += ">";
+  
+  return localStr;
+}
+    
 
 //Set Methods
 void GPX::setName(String name){
@@ -128,9 +157,6 @@ void GPX::setName(String name){
 }
 void GPX::setDesc(String desc){
   _desc = desc;
-}
-void GPX::setEle(String ele){
-  _ele = ele;
 }
 void GPX::setSym(String sym){
   _sym = sym;
@@ -146,4 +172,11 @@ String GPX::wrapCDATA(String input){
   localStr += "]]>";
 
   return localStr;
+}
+
+String GPX::formatPos(long input,unsigned int div){
+  String i(input/div);
+  i += ".";
+  i += abs(input%div);
+  return i; 
 }

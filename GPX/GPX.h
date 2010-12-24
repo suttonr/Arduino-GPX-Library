@@ -76,11 +76,12 @@ class GPX{
     String getTrakSegOpen();
     String getTrakSegClose();
     String getInfo();
-    String getPt(String typ, String lon, String lat);
-    String getPt(String typ, String lon, String lat, String ele);
+    String getPtOpen(String typ, long lon, long lat);
+    String getPtClose(String typ);
+    String getStrParm(String parm,String ele);
+    String getLongParm(String parm,long ele);
     void setName(String name);
     void setDesc(String desc);
-    void setEle(String ele);
     void setSym(String sym);
     void setSrc(String src);
     void setTime(String time);
@@ -88,13 +89,13 @@ class GPX{
     //Variables
     String _name;
     String _desc;
-    String _ele;
     String _sym;
     String _src;
     String _time;
 
     //Functions
     String wrapCDATA(String input);
+    String formatPos(long input,unsigned int div);
 };
 
 #endif
