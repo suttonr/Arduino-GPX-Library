@@ -61,6 +61,7 @@ String GPX::getMetaData(){
   }
   localStr = localStr + String(_GPX_META_TAIL);
   return localStr;
+
 }
 
 String GPX::getTrakOpen(){
@@ -94,6 +95,15 @@ String GPX::getInfo(){
   return localStr;
 }
 
+int GPX::getPtOpen(char* s,long* lon, long* lat){
+  int latI = *lat/100000;
+  long latF = abs(*lat%100000);
+  int lonI = *lon/100000;
+  long lonF = abs(*lon%100000);
+  sprintf_P(s,PSTR(_GPX_PT_HEAD_FMT),latI,latF,lonI,lonF);
+  return 1;
+}
+
 String GPX::getPtOpen(String typ, long lon, long lat){
   String localStr(_GPX_PT_HEAD);
   localStr = localStr.replace("TYPE",typ);
@@ -115,12 +125,13 @@ String GPX::getPtOpen(String typ, long lon, long lat){
     localStr += wrapCDATA(_src);
     localStr += _GPX_SRC_TAIL;
   }
-  localStr += String(_GPX_PT_TAIL).replace("TYPE",typ);
+  //localStr += String(_GPX_PT_TAIL).replace("TYPE",typ);
   return localStr;
 }
 
 String GPX::getPtClose(String typ){
-  return String(_GPX_PT_TAIL).replace("TYPE",typ);
+  return String(_GPX_PT_TAIL).replace("TYPE",typ);;
+
 }
 
 String GPX::getStrParm(String parm,String ele){
@@ -142,7 +153,7 @@ String GPX::getLongParm(String parm,long ele){
   
   localStr += parm;
   localStr += ">";
-  localStr += formatPos(ele,10);
+  localStr += formatPos(ele,100);
   localStr += "</";
   localStr += parm;
   localStr += ">";
@@ -174,7 +185,7 @@ String GPX::wrapCDATA(String input){
   return localStr;
 }
 
-String GPX::formatPos(long input,unsigned int div){
+String GPX::formatPos(long input,long div){
   String i(input/div);
   i += ".";
   i += abs(input%div);
