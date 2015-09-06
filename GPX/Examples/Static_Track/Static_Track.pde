@@ -16,7 +16,7 @@ void loop(){
   myGPX.setDesc("Track description");
   myGPX.setSrc("SUP500Ff");
   Serial.print(myGPX.getMetaData());
-  Serial.print(myGPX.getfTrakOpen());
+  Serial.print(myGPX.getTrakOpen());
   Serial.print(myGPX.getInfo());
   Serial.print(myGPX.getTrakSegOpen());
   Serial.print(myGPX.getPt(GPX_TRKPT,"41.123","-71.456"));
